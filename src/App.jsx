@@ -89,21 +89,21 @@ export default function App() {
         backgroundSize: "50px 50px",
       }} />
 
-      {/* Multiple floating orbs with enhanced animations */}
+      {/* Multiple floating orbs with enhanced animations - simplified colors */}
       <div 
-        className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-full blur-3xl animate-float-slow transition-transform duration-300"
+        className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-blue-600/15 to-blue-400/10 rounded-full blur-3xl animate-float-slow transition-transform duration-300"
         style={{
           transform: `translate(${mousePos.x}px, ${mousePos.y}px) rotate(${mousePos.x * 0.5}deg)`,
         }}
       />
       <div 
-        className="absolute top-60 right-20 w-80 h-80 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-full blur-3xl animate-float-slower transition-transform duration-300"
+        className="absolute top-60 right-20 w-80 h-80 bg-gradient-to-r from-blue-500/15 to-blue-300/10 rounded-full blur-3xl animate-float-slower transition-transform duration-300"
         style={{
           transform: `translate(${-mousePos.x * 0.8}px, ${mousePos.y * 0.8}px) scale(${1 + Math.sin(Date.now() * 0.001) * 0.1})`,
         }}
       />
       <div 
-        className="absolute bottom-40 left-1/2 w-64 h-64 bg-gradient-to-r from-green-500/15 to-blue-500/15 rounded-full blur-2xl animate-pulse transition-transform duration-300"
+        className="absolute bottom-40 left-1/2 w-64 h-64 bg-gradient-to-r from-blue-400/10 to-blue-600/10 rounded-full blur-2xl animate-pulse transition-transform duration-300"
         style={{
           transform: `translate(${mousePos.x * 0.5}px, ${-mousePos.y * 0.5}px)`,
         }}
@@ -133,11 +133,11 @@ export default function App() {
             <span className="text-gray-300 text-sm">Building the Future of Remote Interviews</span>
           </div>
           <h1 className="text-5xl md:text-7xl font-black leading-tight mb-8 animate-slide-up">
-            Secure Remote <br />
-            <span className="animated-gradient-text">Technical Interviews</span>
+            Mail-Delivered <br />
+            <span className="animated-gradient-text">Interview Kits</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto animate-fade-in-slow">
-            We're building hardware-secured interview kits that prevent cheating and deliver a premium candidate experience for remote technical hiring.
+            We're building secure hardware kits that ship directly to candidates, creating tamper-proof environments for remote technical interviews.
           </p>
         </div>
       </section>
@@ -146,12 +146,12 @@ export default function App() {
       <section className="relative z-10 py-20 px-6 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Problem Card */}
-          <div className="group bg-gradient-to-br from-red-900/20 to-red-800/10 backdrop-blur-xl p-8 rounded-3xl border border-red-800/30 shadow-2xl relative overflow-hidden hover:transform hover:-translate-y-2 hover:scale-105 transition-all duration-500 animate-slide-in-left">
-            <div className="absolute inset-0 bg-gradient-to-br from-red-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-red-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
+          <div className="group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl p-8 rounded-3xl border border-gray-700/50 shadow-2xl relative overflow-hidden hover:transform hover:-translate-y-2 hover:scale-105 transition-all duration-500 animate-slide-in-left">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
             <div className="relative z-10">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mr-4 group-hover:rotate-12 transition-transform duration-300">
+                <div className="w-12 h-12 bg-red-600/50 rounded-xl flex items-center justify-center mr-4 group-hover:rotate-12 transition-transform duration-300">
                   <ShieldCheck className="w-6 h-6 text-red-400" />
                 </div>
                 <h3 className="text-2xl font-bold">The Problem</h3>
@@ -163,18 +163,18 @@ export default function App() {
           </div>
 
           {/* Solution Card */}
-          <div className="group bg-gradient-to-br from-green-900/20 to-green-800/10 backdrop-blur-xl p-8 rounded-3xl border border-green-800/30 shadow-2xl relative overflow-hidden hover:transform hover:-translate-y-2 hover:scale-105 transition-all duration-500 animate-slide-in-right">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-green-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
+          <div className="group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl p-8 rounded-3xl border border-gray-700/50 shadow-2xl relative overflow-hidden hover:transform hover:-translate-y-2 hover:scale-105 transition-all duration-500 animate-slide-in-right">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
             <div className="relative z-10">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mr-4 group-hover:rotate-12 transition-transform duration-300">
-                  <Cpu className="w-6 h-6 text-green-400" />
+                <div className="w-12 h-12 bg-blue-600/20 rounded-xl flex items-center justify-center mr-4 group-hover:rotate-12 transition-transform duration-300">
+                  <Cpu className="w-6 h-6 text-blue-400" />
                 </div>
                 <h3 className="text-2xl font-bold">Our Solution</h3>
               </div>
               <p className="text-gray-300 text-lg leading-relaxed">
-                Hardware-secured interview kits that create a controlled, tamper-proof environment for technical assessments, building trust and ensuring fairness.
+                Mail-delivered hardware kits that create a controlled, tamper-proof environment for technical assessments, building trust and ensuring fairness.
               </p>
             </div>
           </div>
@@ -192,27 +192,27 @@ export default function App() {
               icon: Mail, 
               title: "Kit Delivery", 
               desc: "We'll ship secure hardware directly to candidates anywhere in the world.",
-              color: "from-blue-500/20 to-blue-600/10",
+              color: "from-gray-900/60 to-gray-800/30",
               iconColor: "text-blue-400",
-              borderColor: "border-blue-500/30",
+              borderColor: "border-gray-700/50",
               delay: "0s"
             },
             { 
               icon: Lock, 
               title: "Secure Environment", 
               desc: "The kit boots into a locked, monitored interview environment with built-in integrity checks.",
-              color: "from-purple-500/20 to-purple-600/10",
-              iconColor: "text-purple-400",
-              borderColor: "border-purple-500/30",
+              color: "from-gray-900/60 to-gray-800/30",
+              iconColor: "text-blue-400",
+              borderColor: "border-gray-700/50",
               delay: "0.2s"
             },
             { 
               icon: LineChart, 
               title: "Trust & Analytics", 
               desc: "Real-time monitoring and post-interview reports ensure complete transparency.",
-              color: "from-pink-500/20 to-pink-600/10",
-              iconColor: "text-pink-400",
-              borderColor: "border-pink-500/30",
+              color: "from-gray-900/60 to-gray-800/30",
+              iconColor: "text-blue-400",
+              borderColor: "border-gray-700/50",
               delay: "0.4s"
             },
           ].map((step, i) => (
@@ -221,8 +221,8 @@ export default function App() {
               className={`group bg-gradient-to-br ${step.color} backdrop-blur-xl p-8 rounded-3xl border ${step.borderColor} shadow-2xl text-center relative overflow-hidden transform-gpu hover:transform hover:-translate-y-4 hover:scale-105 hover:rotate-1 transition-all duration-500 animate-scale-in-delayed`}
               style={{ animationDelay: step.delay }}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-white/10 to-transparent rounded-full group-hover:scale-150 group-hover:rotate-180 transition-all duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full group-hover:scale-150 group-hover:rotate-180 transition-all duration-700" />
               <div className="relative z-10">
                 <div className="w-16 h-16 bg-gray-900/50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-gray-800/50 transition-all duration-300 group-hover:rotate-360 group-hover:scale-125">
                   <step.icon className={`w-8 h-8 ${step.iconColor}`} />
@@ -240,7 +240,7 @@ export default function App() {
         <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/40 backdrop-blur-2xl rounded-3xl p-10 border border-gray-700/50 shadow-2xl text-center relative overflow-hidden animate-fade-up-delayed">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5 opacity-50" />
           <div className="absolute -top-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl animate-float-slow" />
-          <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl animate-float-slower" />
+          <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-400/10 rounded-full blur-2xl animate-float-slower" />
           <div className="relative z-10">
             <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-spin-slow hover:animate-spin transition-all duration-300">
               <Building className="w-10 h-10 text-white" />
@@ -260,8 +260,8 @@ export default function App() {
       {/* Email Signup */}
       <section className="relative z-10 py-20 px-6">
         <div className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-2xl rounded-3xl p-10 border border-gray-700/50 shadow-2xl max-w-lg mx-auto relative overflow-hidden animate-scale-in-delayed">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10 opacity-50" />
-          <div className="absolute -top-5 -right-5 w-20 h-20 bg-gradient-to-br from-pink-500/20 to-blue-500/20 rounded-full blur-xl animate-pulse" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-blue-400/5 opacity-50" />
+          <div className="absolute -top-5 -right-5 w-20 h-20 bg-gradient-to-br from-blue-500/20 to-blue-400/10 rounded-full blur-xl animate-pulse" />
           <div className="relative z-10">
             {!submitted ? (
               <>
@@ -280,7 +280,7 @@ export default function App() {
                 />
                 <button
                   onClick={handleSubmit}
-                  className="glow-button w-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white font-bold py-4 px-8 rounded-2xl transition-all duration-300 shadow-xl flex items-center justify-center group hover:scale-105 hover:shadow-2xl animate-fade-in-delayed"
+                  className="glow-button w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-4 px-8 rounded-2xl transition-all duration-300 shadow-xl flex items-center justify-center group hover:scale-105 hover:shadow-2xl animate-fade-in-delayed"
                 >
                   Join Early Access List
                   <div className="ml-3 group-hover:translate-x-1 transition-transform duration-200">
@@ -325,8 +325,8 @@ export default function App() {
         }
         
         @keyframes glowPulse {
-          0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(236, 72, 153, 0.2); }
-          50% { box-shadow: 0 0 30px rgba(236, 72, 153, 0.7), 0 0 60px rgba(59, 130, 246, 0.3); }
+          0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.2); }
+          50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.7), 0 0 60px rgba(59, 130, 246, 0.3); }
         }
         .glow-button:hover { animation: glowPulse 2s infinite alternate; }
         
@@ -405,7 +405,7 @@ export default function App() {
         
         @keyframes glowSubtle {
           0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.2); }
-          50% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
+          50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
         }
         .animate-glow-subtle { animation: glowSubtle 3s ease-in-out infinite; }
         
