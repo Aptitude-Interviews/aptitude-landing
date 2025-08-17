@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState, forwardRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+import { useForm, ValidationError } from "@formspree/react";
 import { CheckCircle2, ArrowRight, Mail, Package, MonitorCheck, ShieldCheck, Sparkles } from "lucide-react";
 
 const AptitudeLogo = ({ className = "w-7 h-7" }) => (
@@ -152,6 +153,7 @@ const TimelineItem = forwardRef(function TimelineItem(
 export default function AptitudeLanding() {
   const [currentStep, setCurrentStep] = useState(0);
   const [email, setEmail] = useState("");
+    const [state, handleSubmit] = useForm("mblkekbj");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
 
@@ -326,46 +328,54 @@ export default function AptitudeLanding() {
         </section>
 
         {/* Early Access */}
-        <section id="early-access" className="scroll-mt-24 border-t border-border/60 bg-background/80">
-          <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-            <div className="mx-auto max-w-lg rounded-3xl border border-border/70 bg-card/70 p-8 shadow-xl backdrop-blur-md">
-              {!submitted ? (
-                <>
-                  <div className="mb-6 text-center">
-                    <h3 className="text-2xl md:text-3xl font-bold text-heading">Get Early Access</h3>
-                    <p className="mt-2 text-text">Join the waitlist to revolutionize your hiring process.</p>
-                  </div>
-                  <form onSubmit={onSubmit} noValidate className="space-y-4">
-                    <label htmlFor="email" className="sr-only">Work email</label>
-                    <input
-                      id="email"
-                      type="email"
-                      placeholder="you@company.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded-xl border border-border/70 bg-input px-4 py-3 text-sm text-text placeholder-secondary outline-none ring-0 transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-                      autoComplete="email"
-                      required
-                    />
-                    <button
-                      type="submit"
-                      className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow hover:opacity-95 transition"
-                    >
-                      Join Waitlist
-                    </button>
-                    {error && <p className="text-danger text-sm">{error}</p>}
-                  </form>
-                </>
-              ) : (
+<section id="early-access" className="scroll-mt-24 border-t border-border/60 bg-background/80">
+          <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+            <div className="mx-auto max-w-lg rounded-3xl border border-border/70 bg-card/70 p-8 shadow-xl backdrop-blur-md">
+              {/* ✨ 2. Check for success state from the hook */}
+              {state.succeeded ? (
                 <div className="text-center">
                   <CheckCircle2 className="mx-auto h-14 w-14 text-emerald-500" />
                   <h3 className="mt-4 text-2xl font-bold text-heading">You're on the list!</h3>
                   <p className="mt-1 text-text">Thanks for your interest. We'll be in touch soon.</p>
                 </div>
+              ) : (
+                <>
+                  <div className="mb-6 text-center">
+                    <h3 className="text-2xl md:text-3xl font-bold text-heading">Get Early Access</h3>
+                    <p className="mt-2 text-text">Join the waitlist to revolutionize your hiring process.</p>
+                  </div>
+                  {/* ✨ 3. Use the handleSubmit function */}
+                  <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                    <label htmlFor="email" className="sr-only">Work email</label>
+                    <input
+                      id="email"
+                      type="email"
+                      name="email" // 👈 Add name attribute
+                      placeholder="you@company.com"
+                      className="w-full rounded-xl border border-border/70 bg-input px-4 py-3 text-sm text-text placeholder-secondary outline-none ring-0 transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+                      autoComplete="email"
+                      required
+                    />
+                    {/* ✨ 4. Use the ValidationError component for cleaner errors */}
+                    <ValidationError 
+                      prefix="Email" 
+                      field="email"
+                      errors={state.errors}
+                      className="text-danger text-sm"
+                    />
+                    <button
+                      type="submit"
+                      disabled={state.submitting} // 👈 Disable button while submitting
+                      className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow hover:opacity-95 transition disabled:opacity-60"
+                    >
+                      {state.submitting ? 'Submitting...' : 'Join Waitlist'}
+                    </button>
+                  </form>
+                </>
               )}
-            </div>
-          </div>
-        </section>
+            </div>
+          </div>
+        </section>
       </main>
 
       <footer className="border-t border-border/60 bg-background/80">
