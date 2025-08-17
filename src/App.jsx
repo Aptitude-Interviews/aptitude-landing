@@ -1,14 +1,8 @@
-import React, { useState, useRef } from "react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  AnimatePresence,
-  useMotionValueEvent,
-} from "framer-motion";
-import { CheckCircle, ArrowRight, Mail, Package, MonitorCheck } from "lucide-react";
+import React, { useEffect, useMemo, useRef, useState, forwardRef } from "react";
+import { motion, AnimatePresence, useInView } from "framer-motion";
+import { CheckCircle2, ArrowRight, Mail, Package, MonitorCheck, ShieldCheck, Sparkles } from "lucide-react";
 
-const AptitudeLogo = ({ className = "w-12 h-12" }) => (
+const AptitudeLogo = ({ className = "w-7 h-7" }) => (
   <svg className={className} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M24 4L38 12V28L24 36L10 28V12L24 4Z" fill="currentColor" />
   </svg>
@@ -17,204 +11,365 @@ const AptitudeLogo = ({ className = "w-12 h-12" }) => (
 const steps = [
   {
     icon: Mail,
-    title: "1. Invite Your Candidate",
+    title: "Invite Your Candidate",
     description:
-      "Simply provide us with your candidate's email. We handle all the logistics from here, ensuring a white-glove experience from the very first touchpoint.",
+      "Provide the candidate's email. We handle the rest with a white‑glove flow from the very first touchpoint.",
   },
   {
     icon: Package,
-    title: "2. We Ship The Kit",
+    title: "We Ship The Kit",
     description:
-      "A pre-configured, secure hardware kit is shipped directly to your candidate. It contains everything they need for a fair and consistent interview.",
+      "A pre‑configured, secure hardware kit goes straight to your candidate—no setup surprises, no support tickets.",
   },
   {
     icon: MonitorCheck,
-    title: "3. Conduct a Secure Interview",
+    title: "Conduct a Secure Interview",
     description:
-      "The kit boots into a locked-down, monitored environment. You can conduct your interview with confidence, knowing the playing field is level for everyone.",
+      "The kit boots into a locked‑down, monitored environment—ensuring fairness and consistency for every interview.",
   },
 ];
 
-export default function App() {
+function DeviceMock({ currentStep }) {
+  const ActiveIcon = steps[currentStep].icon;
+
+  const variants = {
+    enter: { opacity: 0, y: 24, scale: 0.98 },
+    center: { opacity: 1, y: 0, scale: 1 },
+    exit: { opacity: 0, y: -24, scale: 0.98 },
+  };
+
+  return (
+    <motion.div
+      className="relative w-full max-w-md rounded-3xl border border-border/70 bg-card/70 backdrop-blur-md shadow-xl"
+      initial={{ y: 0 }}
+      animate={{ y: 0 }}
+      style={{ boxShadow: "0 30px 80px rgba(0,0,0,0.18)" }}
+    >
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
+        <div className="flex items-center gap-2 text-sm text-secondary">
+          <span className="size-2 rounded-full bg-emerald-500/80" />
+          <span className="size-2 rounded-full bg-amber-500/80" />
+          <span className="size-2 rounded-full bg-rose-500/80" />
+        </div>
+        <div className="text-xs text-secondary">aptitude://interview</div>
+      </div>
+
+      {/* Screen */}
+      <div className="relative p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-secondary">
+            <ShieldCheck className="h-4 w-4" />
+            <span>Secure Session</span>
+          </div>
+          <div className="text-xs text-secondary/70">Step {currentStep + 1} / {steps.length}</div>
+        </div>
+
+        <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-subtle/20">
+          <div className="absolute inset-0 pointer-events-none" aria-hidden />
+          <div className="p-8 min-h-56 flex items-center justify-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStep}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+                className="flex flex-col items-center text-center gap-4"
+              >
+                <ActiveIcon className="h-16 w-16 text-primary/70" />
+                <div>
+                  <h4 className="text-xl font-semibold text-heading">{steps[currentStep].title}</h4>
+                  <p className="mt-1 text-sm text-text/90 max-w-xs">{steps[currentStep].description}</p>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div className="mt-6 h-1.5 w-full rounded-full bg-border/60">
+          <motion.div
+            className="h-1.5 rounded-full bg-primary"
+            style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+            transition={{ type: "spring", stiffness: 120, damping: 20 }}
+          />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// TimelineItem uses forwarded ref; `active` is driven by the parent.
+const TimelineItem = forwardRef(function TimelineItem(
+  { index, title, description, Icon, active },
+  ref
+) {
+  // Local reveal animation observer (does not control active state)
+  const revealRef = useRef(null);
+  const revealed = useInView(revealRef, { amount: 0.25, margin: "-10% 0px -10% 0px" });
+
+  return (
+    <article ref={ref} className="relative pl-10">
+      {/* Marker */}
+      <div className="absolute left-0 top-1.5 flex items-center">
+        <div className="relative">
+          <motion.span
+            className="absolute -inset-2 rounded-full bg-primary/15"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: active ? 1 : 0 }}
+            transition={{ duration: 0.3 }}
+          />
+          <motion.div
+            className={`size-3 rounded-full border ${active ? "bg-primary border-primary" : "bg-muted border-border"}`}
+            aria-hidden
+          />
+        </div>
+      </div>
+
+      <motion.div
+        ref={revealRef}
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: revealed ? 1 : 0.6, y: revealed ? 0 : 6 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className={`rounded-2xl border px-6 py-6 md:px-7 md:py-7 ${active ? "bg-card/70 backdrop-blur-sm border-border/70 shadow-sm" : "bg-card/40 border-border/60"}`}
+      >
+        <div className="flex items-start gap-4">
+          <div className="shrink-0">
+            <Icon className={`h-6 w-6 ${active ? "text-primary" : "text-secondary"}`} />
+          </div>
+          <div>
+            <h3 className="text-xl md:text-2xl font-semibold text-heading">{index + 1}. {title}</h3>
+            <p className="mt-2 text-text/90 leading-relaxed">{description}</p>
+          </div>
+        </div>
+      </motion.div>
+    </article>
+  );
+});
+
+export default function AptitudeLanding() {
+  const [currentStep, setCurrentStep] = useState(0);
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
-  const [currentStep, setCurrentStep] = useState(0);
 
-  // --- Scroll logic for the narrative section ---
-  const narrativeRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: narrativeRef,
-    offset: ["start start", "end end"],
-  });
-
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    const step = Math.floor(latest * steps.length);
-    setCurrentStep(step < steps.length ? step : steps.length - 1);
-  });
-
-  // Crossfade each step as you scroll
-  const opacityValues = steps.map((_, i) => {
-    const stepSize = 1 / steps.length;
-    const start = i * stepSize;
-    const end = start + stepSize;
-    const fadeInEnd = start + stepSize * 0.2;
-    const fadeOutStart = end - stepSize * 0.2;
-
-    if (i === 0) {
-      return useTransform(scrollYProgress, [0, fadeOutStart, end], [1, 1, 0]);
-    }
-    if (i === steps.length - 1) {
-      return useTransform(scrollYProgress, [start, fadeInEnd, 1], [0, 1, 1]);
-    }
-    return useTransform(scrollYProgress, [start, fadeInEnd, fadeOutStart, end], [0, 1, 1, 0]);
-  });
-
-  const visualVariants = {
-    0: { scale: 1, rotate: -5, x: "0%" },
-    1: { scale: 1.05, rotate: 5, x: "5%" },
-    2: { scale: 1.1, rotate: -2, x: "10%" },
+  // Refs to each timeline item
+  const itemRefs = useRef([]);
+  const setItemRef = (el, idx) => {
+    itemRefs.current[idx] = el;
   };
 
-  const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email);
+  // Store measured top positions for each item (relative to document)
+  const itemTopsRef = useRef([]);
+  const stepRef = useRef(0);
+  useEffect(() => { stepRef.current = currentStep; }, [currentStep]);
 
-  const handleSubmit = (e) => {
+  // Recalculate positions
+  const recalcPositions = () => {
+    itemTopsRef.current = itemRefs.current.map((el) => (el ? el.getBoundingClientRect().top + window.scrollY : 0));
+  };
+
+  // Scroll handler with direction-aware anchor + hysteresis via midpoints
+  const tickingRef = useRef(false);
+  const lastYRef = useRef(0);
+  useEffect(() => {
+    lastYRef.current = window.scrollY;
+
+    const onScroll = () => {
+      if (tickingRef.current) return;
+      tickingRef.current = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const goingDown = y > lastYRef.current;
+        lastYRef.current = y;
+
+        const tops = itemTopsRef.current;
+        if (!tops.length) { tickingRef.current = false; return; }
+
+        // Direction-aware anchor: switch later when going down (slower), earlier when going up (snappier)
+        const anchorFactor = goingDown ? 0.58 : 0.42; // tweak 0.55/0.45 if desired
+        const anchor = y + window.innerHeight * anchorFactor;
+
+        // Midpoint logic to avoid rapid flipping
+        let next = 0;
+        for (let i = 0; i < tops.length - 1; i++) {
+          const mid = (tops[i] + tops[i + 1]) / 2;
+          if (anchor >= mid) next = i + 1;
+        }
+
+        if (next !== stepRef.current) setCurrentStep(next);
+        tickingRef.current = false;
+      });
+    };
+
+    const onResize = () => {
+      recalcPositions();
+      // Re-run selection after layout change
+      onScroll();
+    };
+
+    // Initial measure
+    recalcPositions();
+    // Initialize selection on mount
+    onScroll();
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
+
+    // Fallback: re-measure after fonts/images paint
+    const t = setTimeout(() => { recalcPositions(); onScroll(); }, 250);
+
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
+  const isValidEmail = (value) => /\S+@\S+\.\S+/.test(value);
+  const onSubmit = (e) => {
     e.preventDefault();
-    if (!isValidEmail(email)) {
-      setError("Please enter a valid email address.");
-      return;
-    }
+    if (!isValidEmail(email)) return setError("Please enter a valid email address.");
     setError("");
     setSubmitted(true);
   };
 
-  // Optional: narrative height based on steps (more robust than hardcoding 350vh)
-  const narrativeHeight = `${steps.length * 120}vh`;
+  const year = useMemo(() => new Date().getFullYear(), []);
 
   return (
-    <div className="min-h-screen bg-background font-sans text-secondary">
-      <header className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-sm z-50">
-        <nav className="flex justify-between items-center px-6 lg:px-12 py-4 max-w-7xl mx-auto">
-          <div className="flex items-center space-x-3">
-            <AptitudeLogo className="w-8 h-8 text-primary" />
-            <span className="text-xl font-bold text-heading">Aptitude</span>
-          </div>
-          <a
-            href="#early-access"
-            className="bg-primary text-white font-semibold py-2 px-5 rounded-full hover:bg-primary-hover transition-all duration-300 shadow-sm hover:shadow-md"
-          >
-            Get Early Access
+    <div className="min-h-screen bg-background text-secondary selection:bg-primary/20">
+      {/* Background layers */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-10"
+        style={{
+          backgroundImage:
+            "radial-gradient(40rem 40rem at 10% -10%, rgba(59,130,246,0.12), transparent 50%), radial-gradient(36rem 36rem at 90% 10%, rgba(16,185,129,0.10), transparent 50%)",
+        }}
+      />
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(to_right,rgba(120,120,120,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(120,120,120,0.08)_1px,transparent_1px)] bg-[size:24px_24px]" />
+
+      {/* Header */}
+      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-md">
+        <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 md:px-6">
+          <a href="#" className="flex items-center gap-2">
+            <AptitudeLogo className="h-7 w-7 text-primary" />
+            <span className="text-base font-bold text-heading">Aptitude</span>
           </a>
+          <div className="flex items-center gap-3">
+            <a href="#early-access" className="hidden md:inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/70 px-4 py-2 text-sm font-medium text-heading shadow-sm hover:bg-card transition">
+              <Sparkles className="h-4 w-4" /> Early Access
+            </a>
+            <a href="#early-access" className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:opacity-95 transition">
+              Get Started <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
         </nav>
       </header>
 
       <main>
-        <section className="text-center px-6 pt-28 pb-20 md:pt-32 md:pb-32">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="text-5xl md:text-7xl font-black text-heading leading-tight mb-4"
-          >
-            Interview with <span className="text-primary">Absolute Certainty</span>.
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
-            className="text-lg md:text-xl max-w-3xl mx-auto text-text"
-          >
-            Aptitude delivers hardware-secured interview kits to ensure cheating-free, consistent, and premium remote technical hiring.
-          </motion.p>
+        {/* Hero */}
+        <section className="relative">
+          <div className="mx-auto max-w-6xl px-6 pt-16 md:pt-24 pb-12">
+            <motion.h1
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="text-4xl md:text-6xl font-black tracking-tight text-heading"
+            >
+              Interview with <span className="bg-gradient-to-r from-primary to-rose-500 bg-clip-text text-transparent">absolute certainty</span>.
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut", delay: 0.08 }}
+              className="mt-4 max-w-2xl text-base md:text-lg text-text"
+            >
+              Hardware‑secured, cheating‑resistant interview kits. Consistent, fair, premium remote hiring—no compromises.
+            </motion.p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a href="#early-access" className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow hover:opacity-95 transition">
+                Join the waitlist <ArrowRight className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
         </section>
 
-        {/* Narrative Section */}
-        <section ref={narrativeRef} className="relative" style={{ height: narrativeHeight }}>
-          <div className="sticky top-0 flex h-screen items-center overflow-hidden">
-            <div className="flex flex-col lg:flex-row items-center justify-center max-w-7xl mx-auto px-6 gap-12">
-              {/* Left: scrolling text (fixed width rules to prevent squish) */}
-              <div className="w-full lg:flex-[0_0_50%] lg:shrink-0 relative flex items-center min-h-[20rem]">
-                {steps.map((step, index) => (
-                  <motion.div
-                    key={index}
-                    style={{ opacity: opacityValues[index] }}
-                    className="absolute inset-0 w-full h-full pointer-events-none flex items-center justify-center"
-                  >
-                    <div className="pointer-events-auto w-full max-w-xl min-w-[22rem] bg-card/60 backdrop-blur-md p-8 rounded-2xl shadow-sm border border-border/50">
-                      <step.icon aria-hidden="true" className="w-10 h-10 text-primary mb-4" />
-                      <h3 className="text-3xl font-bold text-heading mb-3">{step.title}</h3>
-                      <p className="text-lg leading-relaxed text-text">{step.description}</p>
-                    </div>
-                  </motion.div>
+        {/* Timeline + Sticky Visual */}
+        <section id="how-it-works" className="relative">
+          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 py-8 md:py-12 lg:grid-cols-2 lg:gap-16">
+            {/* Left: timeline */}
+            <div className="relative">
+              <div className="absolute left-1.5 top-0 bottom-0 w-px bg-border/60" aria-hidden />
+              <div className="space-y-10 md:space-y-16">
+                {steps.map((s, i) => (
+                  <TimelineItem
+                    key={s.title}
+                    index={i}
+                    title={s.title}
+                    description={s.description}
+                    Icon={s.icon}
+                    active={currentStep === i}
+                    ref={(el) => setItemRef(el, i)}
+                  />
                 ))}
               </div>
+            </div>
 
-              {/* Right: visual */}
-              <div className="w-full lg:flex-[0_0_50%] lg:shrink-0 h-96 flex items-center justify-center">
-                <motion.div
-                  variants={visualVariants}
-                  animate={currentStep.toString()}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="relative w-80 h-56 rounded-2xl bg-card shadow-2xl flex items-center justify-center border border-border/50"
-                >
-                  <div className="w-4/5 h-4/5 rounded-lg bg-subtle/30 flex items-center justify-center">
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={currentStep}
-                        initial={{ opacity: 0, scale: 0.7, rotate: -30 }}
-                        animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                        exit={{ opacity: 0, scale: 0.7, rotate: 30 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="absolute flex items-center justify-center w-full h-full"
-                      >
-                        {React.createElement(steps[currentStep].icon, { className: "w-20 h-20 text-primary/60" })}
-                      </motion.div>
-                    </AnimatePresence>
-                  </div>
-                </motion.div>
-              </div>
+            {/* Right: sticky visual */}
+            <div className="lg:sticky lg:top-24 self-start">
+              <DeviceMock currentStep={currentStep} />
             </div>
           </div>
         </section>
 
         {/* Early Access */}
-        <section id="early-access" className="scroll-mt-24 md:scroll-mt-32 py-20 px-6 bg-background">
-          <div className="bg-card rounded-2xl shadow-xl max-w-md mx-auto p-10 border border-border">
-            {!submitted ? (
-              <>
-                <h3 className="text-3xl font-bold text-heading mb-2 text-center">Get Early Access</h3>
-                <p className="mb-8 text-center text-text">Join the waitlist to revolutionize your hiring process.</p>
-                <form onSubmit={handleSubmit}>
-                  <input
-                    type="email"
-                    placeholder="you@company.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-5 py-3 bg-input border border-border rounded-lg text-text placeholder-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary mb-4 transition-all"
-                  />
-                  <button
-                    type="submit"
-                    className="w-full bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary-hover transition-all duration-300 flex items-center justify-center shadow-sm hover:shadow-md"
-                  >
-                    Join Waitlist
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </button>
-                  {error && <p className="text-danger text-sm mt-4 text-center">{error}</p>}
-                </form>
-              </>
-            ) : (
-              <div className="text-center">
-                <CheckCircle className="w-16 h-16 text-success mx-auto mb-6" />
-                <h3 className="text-3xl font-bold text-heading mb-3">You're on the list!</h3>
-                <p className="text-text">Thank you for your interest. We'll be in touch with updates soon.</p>
-              </div>
-            )}
+        <section id="early-access" className="scroll-mt-24 border-t border-border/60 bg-background/80">
+          <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+            <div className="mx-auto max-w-lg rounded-3xl border border-border/70 bg-card/70 p-8 shadow-xl backdrop-blur-md">
+              {!submitted ? (
+                <>
+                  <div className="mb-6 text-center">
+                    <h3 className="text-2xl md:text-3xl font-bold text-heading">Get Early Access</h3>
+                    <p className="mt-2 text-text">Join the waitlist to revolutionize your hiring process.</p>
+                  </div>
+                  <form onSubmit={onSubmit} noValidate className="space-y-4">
+                    <label htmlFor="email" className="sr-only">Work email</label>
+                    <input
+                      id="email"
+                      type="email"
+                      placeholder="you@company.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full rounded-xl border border-border/70 bg-input px-4 py-3 text-sm text-text placeholder-secondary outline-none ring-0 transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+                      autoComplete="email"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow hover:opacity-95 transition"
+                    >
+                      Join Waitlist
+                    </button>
+                    {error && <p className="text-danger text-sm">{error}</p>}
+                  </form>
+                </>
+              ) : (
+                <div className="text-center">
+                  <CheckCircle2 className="mx-auto h-14 w-14 text-emerald-500" />
+                  <h3 className="mt-4 text-2xl font-bold text-heading">You're on the list!</h3>
+                  <p className="mt-1 text-text">Thanks for your interest. We'll be in touch soon.</p>
+                </div>
+              )}
+            </div>
           </div>
         </section>
       </main>
 
-      <footer className="text-center py-8 px-6 border-t border-border">
-        <p className="text-text">&copy; {new Date().getFullYear()} Aptitude. All rights reserved.</p>
+      <footer className="border-t border-border/60 bg-background/80">
+        <div className="mx-auto max-w-6xl px-6 py-10 text-center text-sm text-text/80">© {year} Aptitude. All rights reserved.</div>
       </footer>
     </div>
   );
