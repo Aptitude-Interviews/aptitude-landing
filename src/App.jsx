@@ -1,428 +1,376 @@
-import React, { useState, useEffect } from "react";
-import {
-  CheckCircle,
-  ArrowRight,
-  Lock,
-  Monitor,
-  Users,
-  Zap,
-  Award,
-  ShieldCheck,
-  Cpu,
-  LineChart,
-  Rocket,
-  Mail,
-  Building,
-} from "lucide-react";
+import React, { useEffect, useMemo, useRef, useState, forwardRef } from "react";
+import { motion, AnimatePresence, useInView } from "framer-motion";
+import { CheckCircle2, ArrowRight, Mail, Package, MonitorCheck, ShieldCheck, Sparkles } from "lucide-react";
 
-// Logo Component
-const AptitudeLogo = ({ className = "w-12 h-12" }) => (
-  <svg
-    className={className}
-    viewBox="0 0 48 48"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <defs>
-      <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#3B82F6" />
-        <stop offset="50%" stopColor="#8B5CF6" />
-        <stop offset="100%" stopColor="#EC4899" />
-      </linearGradient>
-    </defs>
-
-    <path
-      d="M24 4L38 12V28L24 36L10 28V12L24 4Z"
-      fill="url(#logoGradient)"
-      stroke="white"
-      strokeWidth="1.5"
-    />
-    <circle cx="24" cy="16" r="2" fill="white" />
-    <circle cx="18" cy="24" r="2" fill="white" />
-    <circle cx="30" cy="24" r="2" fill="white" />
-    <circle cx="24" cy="32" r="2" fill="white" />
-    <line x1="24" y1="18" x2="20" y2="22" stroke="white" strokeWidth="1.5" />
-    <line x1="24" y1="18" x2="28" y2="22" stroke="white" strokeWidth="1.5" />
-    <line x1="20" y1="26" x2="24" y2="30" stroke="white" strokeWidth="1.5" />
-    <line x1="28" y1="26" x2="24" y2="30" stroke="white" strokeWidth="1.5" />
-    <rect x="22" y="22" width="4" height="4" rx="1" fill="white" />
+const AptitudeLogo = ({ className = "w-7 h-7" }) => (
+  <svg className={className} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M24 4L38 12V28L24 36L10 28V12L24 4Z" fill="currentColor" />
   </svg>
 );
 
-export default function App() {
+const steps = [
+  {
+    icon: Mail,
+    title: "Invite Your Candidate",
+    description:
+      "Provide the candidate's email. We handle the rest with a white‑glove flow from the very first touchpoint.",
+  },
+  {
+    icon: Package,
+    title: "We Ship The Kit",
+    description:
+      "A pre‑configured, secure hardware kit goes straight to your candidate—no setup surprises, no support tickets.",
+  },
+  {
+    icon: MonitorCheck,
+    title: "Conduct a Secure Interview",
+    description:
+      "The kit boots into a locked‑down, monitored environment—ensuring fairness and consistency for every interview.",
+  },
+];
+
+function DeviceMock({ currentStep }) {
+  const ActiveIcon = steps[currentStep].icon;
+
+  const variants = {
+    enter: { opacity: 0, y: 24, scale: 0.98 },
+    center: { opacity: 1, y: 0, scale: 1 },
+    exit: { opacity: 0, y: -24, scale: 0.98 },
+  };
+
+  return (
+    <motion.div
+      className="relative w-full max-w-md rounded-3xl border border-border/70 bg-card/70 backdrop-blur-md shadow-xl"
+      initial={{ y: 0 }}
+      animate={{ y: 0 }}
+      style={{ boxShadow: "0 30px 80px rgba(0,0,0,0.18)" }}
+    >
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
+        <div className="flex items-center gap-2 text-sm text-secondary">
+          <span className="size-2 rounded-full bg-emerald-500/80" />
+          <span className="size-2 rounded-full bg-amber-500/80" />
+          <span className="size-2 rounded-full bg-rose-500/80" />
+        </div>
+        <div className="text-xs text-secondary">aptitude://interview</div>
+      </div>
+
+      {/* Screen */}
+      <div className="relative p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-secondary">
+            <ShieldCheck className="h-4 w-4" />
+            <span>Secure Session</span>
+          </div>
+          <div className="text-xs text-secondary/70">Step {currentStep + 1} / {steps.length}</div>
+        </div>
+
+        <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-subtle/20">
+          <div className="absolute inset-0 pointer-events-none" aria-hidden />
+          <div className="p-8 min-h-56 flex items-center justify-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStep}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+                className="flex flex-col items-center text-center gap-4"
+              >
+                <ActiveIcon className="h-16 w-16 text-primary/70" />
+                <div>
+                  <h4 className="text-xl font-semibold text-heading">{steps[currentStep].title}</h4>
+                  <p className="mt-1 text-sm text-text/90 max-w-xs">{steps[currentStep].description}</p>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div className="mt-6 h-1.5 w-full rounded-full bg-border/60">
+          <motion.div
+            className="h-1.5 rounded-full bg-primary"
+            style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+            transition={{ type: "spring", stiffness: 120, damping: 20 }}
+          />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// TimelineItem uses forwarded ref; `active` is driven by the parent.
+const TimelineItem = forwardRef(function TimelineItem(
+  { index, title, description, Icon, active },
+  ref
+) {
+  // Local reveal animation observer (does not control active state)
+  const revealRef = useRef(null);
+  const revealed = useInView(revealRef, { amount: 0.25, margin: "-10% 0px -10% 0px" });
+
+  return (
+    <article ref={ref} className="relative pl-10">
+      {/* Marker */}
+      <div className="absolute left-0 top-1.5 flex items-center">
+        <div className="relative">
+          <motion.span
+            className="absolute -inset-2 rounded-full bg-primary/15"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: active ? 1 : 0 }}
+            transition={{ duration: 0.3 }}
+          />
+          <motion.div
+            className={`size-3 rounded-full border ${active ? "bg-primary border-primary" : "bg-muted border-border"}`}
+            aria-hidden
+          />
+        </div>
+      </div>
+
+      <motion.div
+        ref={revealRef}
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: revealed ? 1 : 0.6, y: revealed ? 0 : 6 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className={`rounded-2xl border px-6 py-6 md:px-7 md:py-7 ${active ? "bg-card/70 backdrop-blur-sm border-border/70 shadow-sm" : "bg-card/40 border-border/60"}`}
+      >
+        <div className="flex items-start gap-4">
+          <div className="shrink-0">
+            <Icon className={`h-6 w-6 ${active ? "text-primary" : "text-secondary"}`} />
+          </div>
+          <div>
+            <h3 className="text-xl md:text-2xl font-semibold text-heading">{index + 1}. {title}</h3>
+            <p className="mt-2 text-text/90 leading-relaxed">{description}</p>
+          </div>
+        </div>
+      </motion.div>
+    </article>
+  );
+});
+
+export default function AptitudeLanding() {
+  const [currentStep, setCurrentStep] = useState(0);
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email);
+  // Refs to each timeline item
+  const itemRefs = useRef([]);
+  const setItemRef = (el, idx) => {
+    itemRefs.current[idx] = el;
+  };
 
-  const handleSubmit = (e) => {
+  // Store measured top positions for each item (relative to document)
+  const itemTopsRef = useRef([]);
+  const stepRef = useRef(0);
+  useEffect(() => { stepRef.current = currentStep; }, [currentStep]);
+
+  // Recalculate positions
+  const recalcPositions = () => {
+    itemTopsRef.current = itemRefs.current.map((el) => (el ? el.getBoundingClientRect().top + window.scrollY : 0));
+  };
+
+  // Scroll handler with direction-aware anchor + hysteresis via midpoints
+  const tickingRef = useRef(false);
+  const lastYRef = useRef(0);
+  useEffect(() => {
+    lastYRef.current = window.scrollY;
+
+    const onScroll = () => {
+      if (tickingRef.current) return;
+      tickingRef.current = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const goingDown = y > lastYRef.current;
+        lastYRef.current = y;
+
+        const tops = itemTopsRef.current;
+        if (!tops.length) { tickingRef.current = false; return; }
+
+        // Direction-aware anchor: switch later when going down (slower), earlier when going up (snappier)
+        const anchorFactor = goingDown ? 0.58 : 0.42; // tweak 0.55/0.45 if desired
+        const anchor = y + window.innerHeight * anchorFactor;
+
+        // Midpoint logic to avoid rapid flipping
+        let next = 0;
+        for (let i = 0; i < tops.length - 1; i++) {
+          const mid = (tops[i] + tops[i + 1]) / 2;
+          if (anchor >= mid) next = i + 1;
+        }
+
+        if (next !== stepRef.current) setCurrentStep(next);
+        tickingRef.current = false;
+      });
+    };
+
+    const onResize = () => {
+      recalcPositions();
+      // Re-run selection after layout change
+      onScroll();
+    };
+
+    // Initial measure
+    recalcPositions();
+    // Initialize selection on mount
+    onScroll();
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
+
+    // Fallback: re-measure after fonts/images paint
+    const t = setTimeout(() => { recalcPositions(); onScroll(); }, 250);
+
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
+  const isValidEmail = (value) => /\S+@\S+\.\S+/.test(value);
+  const onSubmit = (e) => {
     e.preventDefault();
-    if (!isValidEmail(email)) {
-      setError("Please enter a valid email address.");
-      return;
-    }
+    if (!isValidEmail(email)) return setError("Please enter a valid email address.");
     setError("");
     setSubmitted(true);
   };
 
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePos({
-        x: (e.clientX / window.innerWidth - 0.5) * 20,
-        y: (e.clientY / window.innerHeight - 0.5) * 20,
-      });
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+  const year = useMemo(() => new Date().getFullYear(), []);
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden font-poppins text-white">
-      {/* Enhanced background effects */}
-      <div className="absolute inset-0 opacity-20" style={{
-        backgroundImage: `
-          linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px)
-        `,
-        backgroundSize: "50px 50px",
-      }} />
-
-      {/* Multiple floating orbs with enhanced animations - simplified colors */}
-      <div 
-        className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-blue-600/15 to-blue-400/10 rounded-full blur-3xl animate-float-slow transition-transform duration-300"
+    <div className="min-h-screen bg-background text-secondary selection:bg-primary/20">
+      {/* Background layers */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-10"
         style={{
-          transform: `translate(${mousePos.x}px, ${mousePos.y}px) rotate(${mousePos.x * 0.5}deg)`,
+          backgroundImage:
+            "radial-gradient(40rem 40rem at 10% -10%, rgba(59,130,246,0.12), transparent 50%), radial-gradient(36rem 36rem at 90% 10%, rgba(16,185,129,0.10), transparent 50%)",
         }}
       />
-      <div 
-        className="absolute top-60 right-20 w-80 h-80 bg-gradient-to-r from-blue-500/15 to-blue-300/10 rounded-full blur-3xl animate-float-slower transition-transform duration-300"
-        style={{
-          transform: `translate(${-mousePos.x * 0.8}px, ${mousePos.y * 0.8}px) scale(${1 + Math.sin(Date.now() * 0.001) * 0.1})`,
-        }}
-      />
-      <div 
-        className="absolute bottom-40 left-1/2 w-64 h-64 bg-gradient-to-r from-blue-400/10 to-blue-600/10 rounded-full blur-2xl animate-pulse transition-transform duration-300"
-        style={{
-          transform: `translate(${mousePos.x * 0.5}px, ${-mousePos.y * 0.5}px)`,
-        }}
-      />
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(to_right,rgba(120,120,120,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(120,120,120,0.08)_1px,transparent_1px)] bg-[size:24px_24px]" />
 
-      {/* Navbar */}
-      <nav className="relative z-10 flex justify-between items-center px-6 py-6 animate-slide-down">
-        <div className="flex items-center space-x-3">
-          <div className="hover:rotate-360 hover:scale-110 transition-all duration-600">
-            <AptitudeLogo className="w-10 h-10" />
+      {/* Header */}
+      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-md">
+        <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 md:px-6">
+          <a href="#" className="flex items-center gap-2">
+            <AptitudeLogo className="h-7 w-7 text-primary" />
+            <span className="text-base font-bold text-heading">Aptitude</span>
+          </a>
+          <div className="flex items-center gap-3">
+            <a href="#early-access" className="hidden md:inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/70 px-4 py-2 text-sm font-medium text-heading shadow-sm hover:bg-card transition">
+              <Sparkles className="h-4 w-4" /> Early Access
+            </a>
+            <a href="#early-access" className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:opacity-95 transition">
+              Get Started <ArrowRight className="h-4 w-4" />
+            </a>
           </div>
-          <span className="text-2xl font-bold">
-            Aptitude{" "}
-            <span className="animated-gradient-text">Interviews</span>
-          </span>
-        </div>
-        <button className="text-gray-300 hover:text-white transition-all duration-300 px-4 py-2 rounded-lg border border-gray-700 hover:border-gray-500 hover:bg-gray-800/50 hover:scale-105 hover:shadow-lg">
-          Contact Us
-        </button>
-      </nav>
+        </nav>
+      </header>
 
-      {/* Hero */}
-      <section className="relative z-10 text-center px-6 pt-20">
-        <div className="animate-fade-up-delayed">
-          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-gray-900/80 to-gray-800/80 backdrop-blur-sm border border-gray-700 rounded-full mb-8 hover:border-blue-500/50 transition-all duration-300 hover:scale-105 animate-glow-subtle">
-            <Rocket className="w-4 h-4 text-blue-400 mr-2" />
-            <span className="text-gray-300 text-sm">Building the Future of Remote Interviews</span>
-          </div>
-          <h1 className="text-5xl md:text-7xl font-black leading-tight mb-8 animate-slide-up">
-            Mail-Delivered <br />
-            <span className="animated-gradient-text">Interview Kits</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto animate-fade-in-slow">
-            We're building secure hardware kits that ship directly to candidates, creating tamper-proof environments for remote technical interviews.
-          </p>
-        </div>
-      </section>
-
-      {/* Problem/Solution Cards */}
-      <section className="relative z-10 py-20 px-6 max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Problem Card */}
-          <div className="group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl p-8 rounded-3xl border border-gray-700/50 shadow-2xl relative overflow-hidden hover:transform hover:-translate-y-2 hover:scale-105 transition-all duration-500 animate-slide-in-left">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
-            <div className="relative z-10">
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-red-600/50 rounded-xl flex items-center justify-center mr-4 group-hover:rotate-12 transition-transform duration-300">
-                  <ShieldCheck className="w-6 h-6 text-red-400" />
-                </div>
-                <h3 className="text-2xl font-bold">The Problem</h3>
-              </div>
-              <p className="text-gray-300 text-lg leading-relaxed">
-                Remote technical interviews suffer from cheating concerns, inconsistent environments, and lack of trust between companies and candidates.
-              </p>
-            </div>
-          </div>
-
-          {/* Solution Card */}
-          <div className="group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl p-8 rounded-3xl border border-gray-700/50 shadow-2xl relative overflow-hidden hover:transform hover:-translate-y-2 hover:scale-105 transition-all duration-500 animate-slide-in-right">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
-            <div className="relative z-10">
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-blue-600/20 rounded-xl flex items-center justify-center mr-4 group-hover:rotate-12 transition-transform duration-300">
-                  <Cpu className="w-6 h-6 text-blue-400" />
-                </div>
-                <h3 className="text-2xl font-bold">Our Solution</h3>
-              </div>
-              <p className="text-gray-300 text-lg leading-relaxed">
-                Mail-delivered hardware kits that create a controlled, tamper-proof environment for technical assessments, building trust and ensuring fairness.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How it Will Work */}
-      <section className="relative z-10 py-20 px-6 max-w-6xl mx-auto">
-        <h2 className="text-4xl font-bold text-center mb-16 animate-fade-up">
-          How It Will Work
-        </h2>
-        <div className="grid md:grid-cols-3 gap-12">
-          {[
-            { 
-              icon: Mail, 
-              title: "Kit Delivery", 
-              desc: "We'll ship secure hardware directly to candidates anywhere in the world.",
-              color: "from-gray-900/60 to-gray-800/30",
-              iconColor: "text-blue-400",
-              borderColor: "border-gray-700/50",
-              delay: "0s"
-            },
-            { 
-              icon: Lock, 
-              title: "Secure Environment", 
-              desc: "The kit boots into a locked, monitored interview environment with built-in integrity checks.",
-              color: "from-gray-900/60 to-gray-800/30",
-              iconColor: "text-blue-400",
-              borderColor: "border-gray-700/50",
-              delay: "0.2s"
-            },
-            { 
-              icon: LineChart, 
-              title: "Trust & Analytics", 
-              desc: "Real-time monitoring and post-interview reports ensure complete transparency.",
-              color: "from-gray-900/60 to-gray-800/30",
-              iconColor: "text-blue-400",
-              borderColor: "border-gray-700/50",
-              delay: "0.4s"
-            },
-          ].map((step, i) => (
-            <div
-              key={i}
-              className={`group bg-gradient-to-br ${step.color} backdrop-blur-xl p-8 rounded-3xl border ${step.borderColor} shadow-2xl text-center relative overflow-hidden transform-gpu hover:transform hover:-translate-y-4 hover:scale-105 hover:rotate-1 transition-all duration-500 animate-scale-in-delayed`}
-              style={{ animationDelay: step.delay }}
+      <main>
+        {/* Hero */}
+        <section className="relative">
+          <div className="mx-auto max-w-6xl px-6 pt-16 md:pt-24 pb-12">
+            <motion.h1
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="text-4xl md:text-6xl font-black tracking-tight text-heading"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full group-hover:scale-150 group-hover:rotate-180 transition-all duration-700" />
-              <div className="relative z-10">
-                <div className="w-16 h-16 bg-gray-900/50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-gray-800/50 transition-all duration-300 group-hover:rotate-360 group-hover:scale-125">
-                  <step.icon className={`w-8 h-8 ${step.iconColor}`} />
-                </div>
-                <h3 className="text-xl font-semibold mb-4">{step.title}</h3>
-                <p className="text-gray-400 leading-relaxed">{step.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Current Status */}
-      <section className="relative z-10 py-20 px-6 max-w-4xl mx-auto">
-        <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/40 backdrop-blur-2xl rounded-3xl p-10 border border-gray-700/50 shadow-2xl text-center relative overflow-hidden animate-fade-up-delayed">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5 opacity-50" />
-          <div className="absolute -top-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl animate-float-slow" />
-          <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-400/10 rounded-full blur-2xl animate-float-slower" />
-          <div className="relative z-10">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-spin-slow hover:animate-spin transition-all duration-300">
-              <Building className="w-10 h-10 text-white" />
-            </div>
-            <h3 className="text-3xl font-bold mb-4">We're Just Getting Started</h3>
-            <p className="text-xl text-gray-300 mb-6 max-w-2xl mx-auto">
-              We're a YC-backed startup in the early stages of building the future of secure remote technical interviews. Join us as we revolutionize how companies hire technical talent.
-            </p>
-            <div className="inline-flex items-center px-6 py-3 bg-yellow-500/10 border border-yellow-500/30 rounded-full animate-glow-subtle">
-              <Zap className="w-5 h-5 text-yellow-400 mr-2" />
-              <span className="text-yellow-200 font-medium">Currently in Development • Launching 2025</span>
+              Interview with <span className="bg-gradient-to-r from-primary to-rose-500 bg-clip-text text-transparent">absolute certainty</span>.
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut", delay: 0.08 }}
+              className="mt-4 max-w-2xl text-base md:text-lg text-text"
+            >
+              Hardware‑secured, cheating‑resistant interview kits. Consistent, fair, premium remote hiring—no compromises.
+            </motion.p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a href="#early-access" className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow hover:opacity-95 transition">
+                Join the waitlist <ArrowRight className="h-4 w-4" />
+              </a>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Email Signup */}
-      <section className="relative z-10 py-20 px-6">
-        <div className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-2xl rounded-3xl p-10 border border-gray-700/50 shadow-2xl max-w-lg mx-auto relative overflow-hidden animate-scale-in-delayed">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-blue-400/5 opacity-50" />
-          <div className="absolute -top-5 -right-5 w-20 h-20 bg-gradient-to-br from-blue-500/20 to-blue-400/10 rounded-full blur-xl animate-pulse" />
-          <div className="relative z-10">
-            {!submitted ? (
-              <>
-                <h3 className="text-3xl font-bold mb-3 text-center animate-fade-in">
-                  Get Early Access
-                </h3>
-                <p className="text-gray-300 mb-6 text-center animate-fade-in-delayed">
-                  Be the first to know when we launch and get priority access to our platform
-                </p>
-                <input
-                  type="email"
-                  placeholder="Enter your work email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-6 py-4 bg-black/50 border-2 border-gray-700 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 mb-4 transition-all duration-300 focus:scale-105 animate-fade-in-delayed"
-                />
-                <button
-                  onClick={handleSubmit}
-                  className="glow-button w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-4 px-8 rounded-2xl transition-all duration-300 shadow-xl flex items-center justify-center group hover:scale-105 hover:shadow-2xl animate-fade-in-delayed"
-                >
-                  Join Early Access List
-                  <div className="ml-3 group-hover:translate-x-1 transition-transform duration-200">
-                    <ArrowRight className="w-6 h-6" />
+        {/* Timeline + Sticky Visual */}
+        <section id="how-it-works" className="relative">
+          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 py-8 md:py-12 lg:grid-cols-2 lg:gap-16">
+            {/* Left: timeline */}
+            <div className="relative">
+              <div className="absolute left-1.5 top-0 bottom-0 w-px bg-border/60" aria-hidden />
+              <div className="space-y-10 md:space-y-16">
+                {steps.map((s, i) => (
+                  <TimelineItem
+                    key={s.title}
+                    index={i}
+                    title={s.title}
+                    description={s.description}
+                    Icon={s.icon}
+                    active={currentStep === i}
+                    ref={(el) => setItemRef(el, i)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Right: sticky visual */}
+            <div className="lg:sticky lg:top-24 self-start">
+              <DeviceMock currentStep={currentStep} />
+            </div>
+          </div>
+        </section>
+
+        {/* Early Access */}
+        <section id="early-access" className="scroll-mt-24 border-t border-border/60 bg-background/80">
+          <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+            <div className="mx-auto max-w-lg rounded-3xl border border-border/70 bg-card/70 p-8 shadow-xl backdrop-blur-md">
+              {!submitted ? (
+                <>
+                  <div className="mb-6 text-center">
+                    <h3 className="text-2xl md:text-3xl font-bold text-heading">Get Early Access</h3>
+                    <p className="mt-2 text-text">Join the waitlist to revolutionize your hiring process.</p>
                   </div>
-                </button>
-                {error && (
-                  <p className="text-red-400 text-sm mt-4 text-center animate-fade-in">
-                    {error}
-                  </p>
-                )}
-              </>
-            ) : (
-              <div className="text-center animate-scale-in">
-                <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce-once">
-                  <CheckCircle className="w-10 h-10 text-white" />
+                  <form onSubmit={onSubmit} noValidate className="space-y-4">
+                    <label htmlFor="email" className="sr-only">Work email</label>
+                    <input
+                      id="email"
+                      type="email"
+                      placeholder="you@company.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full rounded-xl border border-border/70 bg-input px-4 py-3 text-sm text-text placeholder-secondary outline-none ring-0 transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+                      autoComplete="email"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow hover:opacity-95 transition"
+                    >
+                      Join Waitlist
+                    </button>
+                    {error && <p className="text-danger text-sm">{error}</p>}
+                  </form>
+                </>
+              ) : (
+                <div className="text-center">
+                  <CheckCircle2 className="mx-auto h-14 w-14 text-emerald-500" />
+                  <h3 className="mt-4 text-2xl font-bold text-heading">You're on the list!</h3>
+                  <p className="mt-1 text-text">Thanks for your interest. We'll be in touch soon.</p>
                 </div>
-                <h3 className="text-3xl font-bold mb-3">You're In! 🚀</h3>
-                <p className="text-gray-300">Thanks for joining our early access list. We'll keep you updated on our progress and let you know as soon as we're ready to launch!</p>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
-      {/* Enhanced Styles */}
-      <style jsx>{`
-        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap");
-        .font-poppins { font-family: "Poppins", sans-serif; }
-        
-        @keyframes gradientMove {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        .animated-gradient-text {
-          background: linear-gradient(270deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
-          background-size: 600% 600%;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          animation: gradientMove 8s ease infinite;
-        }
-        
-        @keyframes glowPulse {
-          0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.2); }
-          50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.7), 0 0 60px rgba(59, 130, 246, 0.3); }
-        }
-        .glow-button:hover { animation: glowPulse 2s infinite alternate; }
-        
-        @keyframes float-slow {
-          0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
-          33% { transform: translate(30px, -30px) rotate(120deg); }
-          66% { transform: translate(-20px, 20px) rotate(240deg); }
-        }
-        .animate-float-slow { animation: float-slow 20s ease-in-out infinite; }
-        
-        @keyframes float-slower {
-          0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
-          50% { transform: translate(-25px, -25px) rotate(180deg); }
-        }
-        .animate-float-slower { animation: float-slower 25s ease-in-out infinite; }
-        
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-up { animation: fadeUp 0.8s ease-out; }
-        .animate-fade-up-delayed { animation: fadeUp 0.8s ease-out 0.2s both; }
-        
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(50px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-slide-up { animation: slideUp 1s ease-out 0.3s both; }
-        
-        @keyframes slideDown {
-          from { opacity: 0; transform: translateY(-30px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-slide-down { animation: slideDown 0.8s ease-out; }
-        
-        @keyframes slideInLeft {
-          from { opacity: 0; transform: translateX(-50px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        .animate-slide-in-left { animation: slideInLeft 0.8s ease-out 0.4s both; }
-        
-        @keyframes slideInRight {
-          from { opacity: 0; transform: translateX(50px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        .animate-slide-in-right { animation: slideInRight 0.8s ease-out 0.6s both; }
-        
-        @keyframes scaleIn {
-          from { opacity: 0; transform: scale(0.8); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        .animate-scale-in { animation: scaleIn 0.6s ease-out; }
-        .animate-scale-in-delayed { animation: scaleIn 0.6s ease-out 0.8s both; }
-        
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        .animate-fade-in { animation: fadeIn 0.8s ease-out 0.2s both; }
-        .animate-fade-in-delayed { animation: fadeIn 0.8s ease-out 0.4s both; }
-        .animate-fade-in-slow { animation: fadeIn 1.2s ease-out 0.6s both; }
-        
-        @keyframes spinSlow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        .animate-spin-slow { animation: spinSlow 10s linear infinite; }
-        
-        @keyframes bounceOnce {
-          0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
-          40%, 43% { transform: translate3d(0,-30px,0); }
-          70% { transform: translate3d(0,-15px,0); }
-          90% { transform: translate3d(0,-4px,0); }
-        }
-        .animate-bounce-once { animation: bounceOnce 1s ease-out; }
-        
-        @keyframes glowSubtle {
-          0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.2); }
-          50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
-        }
-        .animate-glow-subtle { animation: glowSubtle 3s ease-in-out infinite; }
-        
-        .hover\:rotate-360:hover { transform: rotate(360deg); }
-        .hover\:rotate-12:hover { transform: rotate(12deg); }
-        .group:hover .group-hover\:rotate-360 { transform: rotate(360deg); }
-        .group:hover .group-hover\:rotate-180 { transform: rotate(180deg); }
-        .group:hover .group-hover\:scale-150 { transform: scale(1.5); }
-        .group:hover .group-hover\:scale-125 { transform: scale(1.25); }
-        
-        .transform-gpu { transform: translate3d(0, 0, 0); }
-        .transition-all { transition: all 0.3s ease; }
-        .duration-300 { transition-duration: 300ms; }
-        .duration-500 { transition-duration: 500ms; }
-        .duration-600 { transition-duration: 600ms; }
-        .duration-700 { transition-duration: 700ms; }
-      `}</style>
+      <footer className="border-t border-border/60 bg-background/80">
+        <div className="mx-auto max-w-6xl px-6 py-10 text-center text-sm text-text/80">© {year} Aptitude. All rights reserved.</div>
+      </footer>
     </div>
   );
 }
