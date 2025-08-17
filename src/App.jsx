@@ -335,26 +335,32 @@ export default function AptitudeLanding() {
                     <h3 className="text-2xl md:text-3xl font-bold text-heading">Get Early Access</h3>
                     <p className="mt-2 text-text">Join the waitlist to revolutionize your hiring process.</p>
                   </div>
-                  <form onSubmit={onSubmit} noValidate className="space-y-4">
-                    <label htmlFor="email" className="sr-only">Work email</label>
-                    <input
-                      id="email"
-                      type="email"
-                      placeholder="you@company.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded-xl border border-border/70 bg-input px-4 py-3 text-sm text-text placeholder-secondary outline-none ring-0 transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-                      autoComplete="email"
-                      required
-                    />
-                    <button
-                      type="submit"
-                      className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow hover:opacity-95 transition"
-                    >
-                      Join Waitlist
-                    </button>
-                    {error && <p className="text-danger text-sm">{error}</p>}
-                  </form>
+<form
+  name="waitlist"
+  method="POST"
+  data-netlify="true"
+  className="space-y-4"
+>
+  <input type="hidden" name="form-name" value="waitlist" />
+
+  <label htmlFor="email" className="sr-only">Work email</label>
+  <input
+    id="email"
+    name="email"
+    type="email"
+    placeholder="you@company.com"
+    className="w-full rounded-xl border border-border/70 bg-input px-4 py-3 text-sm text-text placeholder-secondary outline-none ring-0 transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+    autoComplete="email"
+    required
+  />
+
+  <button
+    type="submit"
+    className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow hover:opacity-95 transition"
+  >
+    Join Waitlist
+  </button>
+</form>
                 </>
               ) : (
                 <div className="text-center">
