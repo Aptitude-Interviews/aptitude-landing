@@ -194,7 +194,7 @@ function DeviceMock({ currentStep }) {
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-secondary">
             <ShieldCheck className="h-4 w-4" />
-            <span>How It Works</span>
+            <span>Session Preview</span>
           </div>
           <div className="text-xs text-secondary/70">Step {currentStep + 1} / {steps.length}</div>
         </div>
@@ -405,7 +405,9 @@ export default function AptitudeLanding() {
       <main>
         {/* Hero */}
         <section className="relative">
-          <div className="mx-auto max-w-6xl px-6 pt-16 md:pt-24 pb-12">
+          {/* Hero accent band for contrast/pop */}
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[280px] md:h-[360px] bg-orange-500/20 backdrop-blur-md border-b border-border/60 shadow-[0_4px_15px_rgba(0,0,0,0.08)]" />
+          <div className="relative z-10 mx-auto max-w-6xl px-6 pt-16 md:pt-24 pb-12">
             <motion.h1
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
