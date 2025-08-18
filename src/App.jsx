@@ -16,9 +16,7 @@ import { CheckCircle2, ArrowRight, Mail, Package, MonitorCheck, ShieldCheck, Spa
  */
 
 const AptitudeLogo = ({ className = "w-7 h-7" }) => (
-  <svg className={className} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M24 4L38 12V28L24 36L10 28V12L24 4Z" fill="currentColor" />
-  </svg>
+  <img src="/aptitude.svg" alt="Aptitude Logo" className={className} />
 );
 
 const steps = [
