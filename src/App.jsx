@@ -24,7 +24,7 @@ const steps = [
     icon: Mail,
     title: "Invite Your Candidate",
     description:
-      "Provide the candidate's email. We handle the rest with a white‑glove flow from the very first touchpoint.",
+      "Provide the candidate's email, we'll take of the rest. Seamless scheduling, communication, and onboarding flow.",
   },
   {
     icon: Package,
