@@ -3,6 +3,18 @@ import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useForm, ValidationError } from "@formspree/react";
 import { CheckCircle2, ArrowRight, Mail, Package, MonitorCheck, ShieldCheck, Sparkles } from "lucide-react";
 
+/**
+ * Goal
+ * - Keep the left timeline as the explanatory copy (titles + descriptions).
+ * - Make the right "mock browser" *complementary* instead of duplicative.
+ * - Use step‑specific micro‑UI previews (invite form, shipping tracker, security checks) with minimal text.
+ *
+ * Other lightweight alternatives you could try later (not implemented here):
+ *  - Candidate POV screens (what they see at each step).
+ *  - KPI snapshots (e.g., avg delivery time, pass rate of checks) instead of prose.
+ *  - Trust signals panel (SOC2, audit log peek, ephemeral data policy) for the final step.
+ */
+
 const AptitudeLogo = ({ className = "w-7 h-7" }) => (
   <svg className={className} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M24 4L38 12V28L24 36L10 28V12L24 4Z" fill="currentColor" />
@@ -30,9 +42,130 @@ const steps = [
   },
 ];
 
-function DeviceMock({ currentStep }) {
-  const ActiveIcon = steps[currentStep].icon;
+// --- Right side micro‑UI panels (no repeated copy) ---
+function InvitePanel() {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-sm text-secondary">
+          <Mail className="h-4 w-4" />
+          <span>Invite</span>
+        </div>
+        <span className="text-[11px] text-secondary/70">Auto‑provisioned</span>
+      </div>
 
+      <div className="rounded-xl border border-border/60 bg-card/60 p-3">
+        <div className="flex items-center gap-2">
+          <div className="text-xs text-secondary/80 shrink-0">To</div>
+          <input
+            disabled
+            value="candidate@company.com"
+            className="w-full rounded-md bg-input/70 px-2 py-1.5 text-xs text-text outline-none"
+          />
+          <button disabled className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white opacity-90">
+            Send
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 text-center">
+        {[
+          { label: "Personalized link", done: true },
+          { label: "Pre‑screen checks", done: true },
+          { label: "Scheduling", done: true },
+        ].map((i) => (
+          <div key={i.label} className="rounded-xl border border-border/60 bg-card/40 p-3">
+            <CheckCircle2 className={`mx-auto h-4 w-4 ${i.done ? "text-emerald-500" : "text-secondary"}`} />
+            <div className="mt-1 text-[11px] text-secondary/90">{i.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ShippingPanel() {
+  const phases = [
+    { key: "reserved", label: "Kit reserved" },
+    { key: "label", label: "Label created" },
+    { key: "transit", label: "In transit" },
+    { key: "delivered", label: "Delivered" },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-sm text-secondary">
+          <Package className="h-4 w-4" />
+          <span>Shipment</span>
+        </div>
+        <span className="text-[11px] text-secondary/70">ETA ~2–3 days</span>
+      </div>
+
+      <div className="rounded-xl border border-border/60 bg-card/60 p-4">
+        <div className="text-xs text-secondary/80">Tracking</div>
+        <div className="mt-3 grid grid-cols-4 gap-2">
+          {phases.map((p, idx) => (
+            <div key={p.key} className="flex flex-col items-center">
+              <div className={`h-2 w-full rounded-full ${idx <= 2 ? "bg-primary" : "bg-border/60"}`} />
+              <div className="mt-2 text-[11px] text-center text-secondary/90">{p.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-xl border border-border/60 bg-card/40 p-3">
+          <div className="text-[11px] text-secondary/70">Recipient</div>
+          <div className="mt-1 text-sm text-heading">John Smith</div>
+        </div>
+        <div className="rounded-xl border border-border/60 bg-card/40 p-3">
+          <div className="text-[11px] text-secondary/70">Mode</div>
+          <div className="mt-1 text-sm text-heading">Overnight</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SecurePanel() {
+  const checks = [
+    "Locked browser",
+    "Device integrity",
+    "ID verified",
+    "AV verified",
+    "Network monitored",
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-sm text-secondary">
+          <ShieldCheck className="h-4 w-4" />
+          <span>Security</span>
+        </div>
+        <span className="text-[11px] text-secondary/70">Ready</span>
+      </div>
+
+      <div className="rounded-xl border border-border/60 bg-card/60 p-4">
+        <ul className="grid grid-cols-2 gap-3">
+          {checks.map((c) => (
+            <li key={c} className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              <span className="text-sm text-heading">{c}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <button className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow">
+        Start Interview
+      </button>
+    </div>
+  );
+}
+
+function DeviceMock({ currentStep }) {
   const variants = {
     enter: { opacity: 0, y: 24, scale: 0.98 },
     center: { opacity: 1, y: 0, scale: 1 },
@@ -53,7 +186,7 @@ function DeviceMock({ currentStep }) {
           <span className="size-2 rounded-full bg-amber-500/80" />
           <span className="size-2 rounded-full bg-rose-500/80" />
         </div>
-        <div className="text-xs text-secondary">aptitude://interview</div>
+        <div className="text-xs text-secondary">aptitude://preview</div>
       </div>
 
       {/* Screen */}
@@ -61,14 +194,14 @@ function DeviceMock({ currentStep }) {
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-secondary">
             <ShieldCheck className="h-4 w-4" />
-            <span>Secure Session</span>
+            <span>How It Works</span>
           </div>
           <div className="text-xs text-secondary/70">Step {currentStep + 1} / {steps.length}</div>
         </div>
 
         <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-subtle/20">
           <div className="absolute inset-0 pointer-events-none" aria-hidden />
-          <div className="p-8 min-h-56 flex items-center justify-center">
+          <div className="p-6 sm:p-8 min-h-56">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}
@@ -77,13 +210,11 @@ function DeviceMock({ currentStep }) {
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.35, ease: "easeInOut" }}
-                className="flex flex-col items-center text-center gap-4"
+                className="flex flex-col gap-4"
               >
-                <ActiveIcon className="h-16 w-16 text-primary/70" />
-                <div>
-                  <h4 className="text-xl font-semibold text-heading">{steps[currentStep].title}</h4>
-                  <p className="mt-1 text-sm text-text/90 max-w-xs">{steps[currentStep].description}</p>
-                </div>
+                {currentStep === 0 && <InvitePanel />}
+                {currentStep === 1 && <ShippingPanel />}
+                {currentStep === 2 && <SecurePanel />}
               </motion.div>
             </AnimatePresence>
           </div>
@@ -153,7 +284,7 @@ const TimelineItem = forwardRef(function TimelineItem(
 export default function AptitudeLanding() {
   const [currentStep, setCurrentStep] = useState(0);
   const [email, setEmail] = useState("");
-    const [state, handleSubmit] = useForm("mblkekbj");
+  const [state, handleSubmit] = useForm("mblkekbj");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
 
@@ -320,7 +451,7 @@ export default function AptitudeLanding() {
               </div>
             </div>
 
-            {/* Right: sticky visual */}
+            {/* Right: sticky visual (now micro‑UI instead of repeated text) */}
             <div className="lg:sticky lg:top-24 self-start">
               <DeviceMock currentStep={currentStep} />
             </div>
@@ -328,11 +459,11 @@ export default function AptitudeLanding() {
         </section>
 
         {/* Early Access */}
-<section id="early-access" className="scroll-mt-24 border-t border-border/60 bg-background/80">
-          <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-            <div className="mx-auto max-w-lg rounded-3xl border border-border/70 bg-card/70 p-8 shadow-xl backdrop-blur-md">
-              {/* ✨ 2. Check for success state from the hook */}
-              {state.succeeded ? (
+        <section id="early-access" className="scroll-mt-24 border-t border-border/60 bg-background/80">
+          <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+            <div className="mx-auto max-w-lg rounded-3xl border border-border/70 bg-card/70 p-8 shadow-xl backdrop-blur-md">
+              {/* ✨ 2. Check for success state from the hook */}
+              {state.succeeded ? (
                 <div className="text-center">
                   <CheckCircle2 className="mx-auto h-14 w-14 text-emerald-500" />
                   <h3 className="mt-4 text-2xl font-bold text-heading">You're on the list!</h3>
@@ -373,9 +504,9 @@ export default function AptitudeLanding() {
                   </form>
                 </>
               )}
-            </div>
-          </div>
-        </section>
+            </div>
+          </div>
+        </section>
       </main>
 
       <footer className="border-t border-border/60 bg-background/80">
