@@ -392,11 +392,11 @@ export default function AptitudeLanding() {
             <span className="text-base font-bold text-heading">Aptitude</span>
           </a>
           <div className="flex items-center gap-3">
-            <a href="#early-access" className="hidden md:inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/70 px-4 py-2 text-sm font-medium text-heading shadow-sm hover:bg-card transition">
+            {/* <a href="#early-access" className="hidden md:inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/70 px-4 py-2 text-sm font-medium text-heading shadow-sm hover:bg-card transition">
               <Sparkles className="h-4 w-4" /> Early Access
-            </a>
+            </a> */}
             <a href="#early-access" className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:opacity-95 transition">
-              Get Started <ArrowRight className="h-4 w-4" />
+              Contact Us <ArrowRight className="h-4 w-4" />
             </a>
           </div>
         </nav>
@@ -406,7 +406,7 @@ export default function AptitudeLanding() {
         {/* Hero */}
         <section className="relative">
           {/* Hero accent band for contrast/pop */}
-          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[280px] md:h-[360px] bg-orange-500/20 backdrop-blur-md border-b border-border/60 shadow-[0_4px_15px_rgba(0,0,0,0.08)]" />
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[280px] md:h-[360px] bg-orange-100 backdrop-blur-md border-b border-border/60 shadow-[0_4px_15px_rgba(0,0,0,0.08)]" />
           <div className="relative z-10 mx-auto max-w-6xl px-6 pt-16 md:pt-24 pb-12">
             <motion.h1
               initial={{ opacity: 0, y: 12 }}
@@ -414,7 +414,7 @@ export default function AptitudeLanding() {
               transition={{ duration: 0.6, ease: "easeOut" }}
               className="text-4xl md:text-6xl font-black tracking-tight text-heading"
             >
-              Interview with <span className="bg-gradient-to-r from-primary to-rose-500 bg-clip-text text-transparent">absolute certainty</span>.
+              Interview with <span className="bg-gradient-to-r from-primary to-red-500 bg-clip-text text-transparent">absolute certainty.</span>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 12 }}
