@@ -371,16 +371,6 @@ export default function AptitudeLanding() {
 
   return (
     <div className="min-h-screen bg-background text-secondary selection:bg-primary/20">
-      {/* Background layers */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10"
-        style={{
-          backgroundImage:
-            "radial-gradient(40rem 40rem at 10% -10%, rgba(59,130,246,0.12), transparent 50%), radial-gradient(36rem 36rem at 90% 10%, rgba(16,185,129,0.10), transparent 50%)",
-        }}
-      />
-      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(to_right,rgba(120,120,120,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(120,120,120,0.08)_1px,transparent_1px)] bg-[size:24px_24px]" />
 
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-md">

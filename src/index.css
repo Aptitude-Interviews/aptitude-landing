@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  @apply bg-background;
+}
+
 body {
   @apply bg-background text-secondary;
 }
