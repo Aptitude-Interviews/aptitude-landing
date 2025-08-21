@@ -403,8 +403,14 @@ export default function AptitudeLanding() {
         {/* Hero */}
         <section className="relative">
           {/* Hero accent band for contrast/pop */}
-          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[220px] md:h-[360px] bg-orange-100 backdrop-blur-md border-b border-border/60 shadow-[0_4px_15px_rgba(0,0,0,0.08)]" />
-          <div className="relative z-10 mx-auto max-w-6xl px-6 pt-16 md:pt-24 pb-12">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 z-0
+                      h-[min(56svh,340px)] md:h-[360px]
+                      bg-orange-100 backdrop-blur-md border-b border-border/60
+                      shadow-[0_4px_15px_rgba(0,0,0,0.08)]"
+          />
+          <div className="relative z-10 mx-auto max-w-6xl px-6 pt-20 md:pt-24 pb-14">
             <motion.h1
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
