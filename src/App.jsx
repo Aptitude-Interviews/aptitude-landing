@@ -1,18 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState, forwardRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useForm, ValidationError } from "@formspree/react";
-import { CheckCircle2, ArrowRight, Mail, Package, MonitorCheck, ShieldCheck, Sparkles } from "lucide-react";
+import { CheckCircle2, ArrowRight, Mail, Package, MonitorCheck, ShieldCheck } from "lucide-react";
 
 /**
  * Goal
  * - Keep the left timeline as the explanatory copy (titles + descriptions).
- * - Make the right "mock browser" *complementary* instead of duplicative.
- * - Use step‑specific micro‑UI previews (invite form, shipping tracker, security checks) with minimal text.
- *
- * Other lightweight alternatives you could try later (not implemented here):
- *  - Candidate POV screens (what they see at each step).
- *  - KPI snapshots (e.g., avg delivery time, pass rate of checks) instead of prose.
- *  - Trust signals panel (SOC2, audit log peek, ephemeral data policy) for the final step.
+ * - Make the right "mock browser" complementary instead of duplicative.
+ * - On mobile, co-locate each step's micro‑UI with its copy; keep sticky preview desktop-only.
  */
 
 const AptitudeLogo = ({ className = "w-7 h-7" }) => (
@@ -163,6 +158,7 @@ function SecurePanel() {
   );
 }
 
+// Desktop preview device mock
 function DeviceMock({ currentStep }) {
   const variants = {
     enter: { opacity: 0, y: 24, scale: 0.98 },
@@ -203,10 +199,10 @@ function DeviceMock({ currentStep }) {
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}
-                variants={variants}
                 initial="enter"
                 animate="center"
                 exit="exit"
+                variants={variants}
                 transition={{ duration: 0.35, ease: "easeInOut" }}
                 className="flex flex-col gap-4"
               >
@@ -231,9 +227,27 @@ function DeviceMock({ currentStep }) {
   );
 }
 
+// Mobile-inline panels map
+const panels = [InvitePanel, ShippingPanel, SecurePanel];
+
+// Media-query hook to gate scroll logic on desktop only
+function useMediaQuery(query) {
+  const [matches, setMatches] = React.useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia(query).matches : false
+  );
+  React.useEffect(() => {
+    const mq = window.matchMedia(query);
+    const handler = () => setMatches(mq.matches);
+    mq.addEventListener?.('change', handler);
+    handler();
+    return () => mq.removeEventListener?.('change', handler);
+  }, [query]);
+  return matches;
+}
+
 // TimelineItem uses forwarded ref; `active` is driven by the parent.
 const TimelineItem = forwardRef(function TimelineItem(
-  { index, title, description, Icon, active },
+  { index, title, description, Icon, active, Panel },
   ref
 ) {
   // Local reveal animation observer (does not control active state)
@@ -272,6 +286,13 @@ const TimelineItem = forwardRef(function TimelineItem(
           <div>
             <h3 className="text-xl md:text-2xl font-semibold text-heading">{index + 1}. {title}</h3>
             <p className="mt-2 text-text/90 leading-relaxed">{description}</p>
+
+            {/* Mobile-only preview inline */}
+            {Panel && (
+              <div className="mt-4 block lg:hidden">
+                <Panel />
+              </div>
+            )}
           </div>
         </div>
       </motion.div>
@@ -281,10 +302,7 @@ const TimelineItem = forwardRef(function TimelineItem(
 
 export default function AptitudeLanding() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [email, setEmail] = useState("");
   const [state, handleSubmit] = useForm("mblkekbj");
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState("");
 
   // Refs to each timeline item
   const itemRefs = useRef([]);
@@ -305,12 +323,16 @@ export default function AptitudeLanding() {
   // Scroll handler with direction-aware anchor + hysteresis via midpoints
   const tickingRef = useRef(false);
   const lastYRef = useRef(0);
+
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
+
   useEffect(() => {
     lastYRef.current = window.scrollY;
 
     const onScroll = () => {
       if (tickingRef.current) return;
       tickingRef.current = true;
+
       requestAnimationFrame(() => {
         const y = window.scrollY;
         const goingDown = y > lastYRef.current;
@@ -319,11 +341,10 @@ export default function AptitudeLanding() {
         const tops = itemTopsRef.current;
         if (!tops.length) { tickingRef.current = false; return; }
 
-        // Direction-aware anchor: switch later when going down (slower), earlier when going up (snappier)
-        const anchorFactor = goingDown ? 0.58 : 0.42; // tweak 0.55/0.45 if desired
+        // Same anchor + hysteresis you had before — works great on mobile too
+        const anchorFactor = goingDown ? 0.58 : 0.42;
         const anchor = y + window.innerHeight * anchorFactor;
 
-        // Midpoint logic to avoid rapid flipping
         let next = 0;
         for (let i = 0; i < tops.length - 1; i++) {
           const mid = (tops[i] + tops[i + 1]) / 2;
@@ -337,19 +358,18 @@ export default function AptitudeLanding() {
 
     const onResize = () => {
       recalcPositions();
-      // Re-run selection after layout change
       onScroll();
     };
 
-    // Initial measure
+    // Initial measure + first sync
     recalcPositions();
-    // Initialize selection on mount
     onScroll();
 
+    // Listeners
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize, { passive: true });
 
-    // Fallback: re-measure after fonts/images paint
+    // Re-measure after layout settles (fonts/images)
     const t = setTimeout(() => { recalcPositions(); onScroll(); }, 250);
 
     return () => {
@@ -358,14 +378,6 @@ export default function AptitudeLanding() {
       window.removeEventListener("resize", onResize);
     };
   }, []);
-
-  const isValidEmail = (value) => /\S+@\S+\.\S+/.test(value);
-  const onSubmit = (e) => {
-    e.preventDefault();
-    if (!isValidEmail(email)) return setError("Please enter a valid email address.");
-    setError("");
-    setSubmitted(true);
-  };
 
   const year = useMemo(() => new Date().getFullYear(), []);
 
@@ -380,9 +392,6 @@ export default function AptitudeLanding() {
             <span className="text-base font-bold text-heading">Aptitude</span>
           </a>
           <div className="flex items-center gap-3">
-            {/* <a href="#early-access" className="hidden md:inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/70 px-4 py-2 text-sm font-medium text-heading shadow-sm hover:bg-card transition">
-              <Sparkles className="h-4 w-4" /> Early Access
-            </a> */}
             <a href="#early-access" className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:opacity-95 transition">
               Contact Us <ArrowRight className="h-4 w-4" />
             </a>
@@ -394,7 +403,7 @@ export default function AptitudeLanding() {
         {/* Hero */}
         <section className="relative">
           {/* Hero accent band for contrast/pop */}
-          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[280px] md:h-[360px] bg-orange-100 backdrop-blur-md border-b border-border/60 shadow-[0_4px_15px_rgba(0,0,0,0.08)]" />
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[220px] md:h-[360px] bg-orange-100 backdrop-blur-md border-b border-border/60 shadow-[0_4px_15px_rgba(0,0,0,0.08)]" />
           <div className="relative z-10 mx-auto max-w-6xl px-6 pt-16 md:pt-24 pb-12">
             <motion.h1
               initial={{ opacity: 0, y: 12 }}
@@ -418,7 +427,11 @@ export default function AptitudeLanding() {
               </a>
             </div>
           </div>
+
+          
         </section>
+
+        
 
         {/* Timeline + Sticky Visual */}
         <section id="how-it-works" className="relative">
@@ -427,22 +440,26 @@ export default function AptitudeLanding() {
             <div className="relative">
               <div className="absolute left-1.5 top-0 bottom-0 w-px bg-border/60" aria-hidden />
               <div className="space-y-10 md:space-y-16">
-                {steps.map((s, i) => (
-                  <TimelineItem
-                    key={s.title}
-                    index={i}
-                    title={s.title}
-                    description={s.description}
-                    Icon={s.icon}
-                    active={currentStep === i}
-                    ref={(el) => setItemRef(el, i)}
-                  />
-                ))}
+                {steps.map((s, i) => {
+                  const Panel = panels[i];
+                  return (
+                    <TimelineItem
+                      key={s.title}
+                      index={i}
+                      title={s.title}
+                      description={s.description}
+                      Icon={s.icon}
+                      active={currentStep === i}
+                      Panel={Panel}
+                      ref={(el) => setItemRef(el, i)}
+                    />
+                  );
+                })}
               </div>
             </div>
 
-            {/* Right: sticky visual (now micro‑UI instead of repeated text) */}
-            <div className="lg:sticky lg:top-24 self-start">
+            {/* Right: sticky visual (desktop only) */}
+            <div className="hidden lg:block lg:sticky lg:top-24 self-start">
               <DeviceMock currentStep={currentStep} />
             </div>
           </div>
@@ -452,7 +469,6 @@ export default function AptitudeLanding() {
         <section id="early-access" className="scroll-mt-24 border-t border-border/60 bg-background/80">
           <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
             <div className="mx-auto max-w-lg rounded-3xl border border-border/70 bg-card/70 p-8 shadow-xl backdrop-blur-md">
-              {/* ✨ 2. Check for success state from the hook */}
               {state.succeeded ? (
                 <div className="text-center">
                   <CheckCircle2 className="mx-auto h-14 w-14 text-emerald-500" />
@@ -465,19 +481,17 @@ export default function AptitudeLanding() {
                     <h3 className="text-2xl md:text-3xl font-bold text-heading">Get Early Access</h3>
                     <p className="mt-2 text-text">Join the waitlist to revolutionize your hiring process.</p>
                   </div>
-                  {/* ✨ 3. Use the handleSubmit function */}
                   <form onSubmit={handleSubmit} noValidate className="space-y-4">
                     <label htmlFor="email" className="sr-only">Work email</label>
                     <input
                       id="email"
                       type="email"
-                      name="email" // 👈 Add name attribute
+                      name="email"
                       placeholder="you@company.com"
                       className="w-full rounded-xl border border-border/70 bg-input px-4 py-3 text-sm text-text placeholder-secondary outline-none ring-0 transition focus:border-primary focus:ring-2 focus:ring-primary/30"
                       autoComplete="email"
                       required
                     />
-                    {/* ✨ 4. Use the ValidationError component for cleaner errors */}
                     <ValidationError 
                       prefix="Email" 
                       field="email"
@@ -486,7 +500,7 @@ export default function AptitudeLanding() {
                     />
                     <button
                       type="submit"
-                      disabled={state.submitting} // 👈 Disable button while submitting
+                      disabled={state.submitting}
                       className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow hover:opacity-95 transition disabled:opacity-60"
                     >
                       {state.submitting ? 'Submitting...' : 'Join Waitlist'}
